@@ -1,4 +1,4 @@
-package uk.ac.gla.atanaspam;
+package main.java.uk.ac.gla.atanaspam.pcapj;
 
 /**
  * This class represents the most generic packet.

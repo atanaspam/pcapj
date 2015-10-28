@@ -1,4 +1,4 @@
-package uk.ac.gla.atanaspam;
+package main.java.uk.ac.gla.atanaspam.pcapj;
 
 /**
  * This class stores various constants and auxiliary methods used to parse packets

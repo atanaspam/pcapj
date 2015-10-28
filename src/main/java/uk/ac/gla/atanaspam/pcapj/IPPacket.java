@@ -1,4 +1,4 @@
-package uk.ac.gla.atanaspam;
+package main.java.uk.ac.gla.atanaspam.pcapj;
 
 import java.net.*;
 import java.util.Arrays;
