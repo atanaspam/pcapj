@@ -1,0 +1,116 @@
+pcapj README
+
+pcapj is a small java library that generates java object representations for packets
+captured using tcpdump and saved to a pcap file. The program can currently obtain:
+    * Timestamp
+    * Source MAC Address
+    * Destination MAC Address
+    * Packet Size
+    * Source IP Address
+    * Destination IP Address
+    * Source Port
+    * Destination Port
+    * Payload Size
+    * Sequence Number
+    * Acknowledgement Number
+    * TCP Flags
+
+In order to build pcapj you just need to navigate to the project directory and invoke mvn package.
+
+HISTORY
+
+R 0.5 - The library is now thread-safe.
+R 0.4 - TCP flags, extended documentation, further layout improvements.
+R 0.3 - MAC address capture, SEQ and ACK nums for TCP, overall layout improved.
+R 0.2 - Parsing robustness enhancements, packet timestamps.
+R 0.1 - Initial release.
+
+How to use
+
+The following example class provides an overview of how to use pcapj to
+obtain object representations of packets in libpcap-created files.
+
+import uk.ac.gla.atanaspam.pcapj.*;
+
+public class PacketParser{
+    public static void main(String[] args) {
+        PcapParser pcapParser = new PcapParser();
+        if(pcapParser.openFile("/Users/atanaspam/Desktop/DumpFile02.pcap") < 0){
+            System.err.println("Failed to open " + args[0] + ", exiting.");
+            return;
+        }
+        BasicPacket packet = pcapParser.getPacket();
+        while(packet != BasicPacket.EOF){
+            if(!(packet instanceof IPPacket)){
+                packet = pcapParser.getPacket();
+                continue;
+            }
+            System.out.println(packet);
+
+            packet = pcapParser.getPacket();
+        }
+        pcapParser.closeFile();
+    }
+}
+
+This example shows how to use pcapj in a multi-threaded environment.
+
+import uk.ac.gla.atanaspam.pcapj.*;
+
+public class PacketParser extends Thread{
+    private Thread t;
+    private int threadId;
+    private PcapParser pcapParser;
+
+    public PacketParser(PcapParser pcapParser, int threadId){
+        this.pcapParser = pcapParser;
+        this.threadId = threadId;
+    }
+
+    public static void main(String[] args) {
+        PcapParser pcapParser = new PcapParser();
+        if(pcapParser.openFile("/Users/atanaspam/Desktop/DumpFile03.pcap") < 0){
+            System.err.println("Failed to open " + args[0] + ", exiting.");
+            return;
+        }
+
+        Thread[] threads = new Thread[4];
+        for(int i=0; i<threads.length; i++){
+            threads[i] = new PacketParser(pcapParser, i);
+        }
+        for(int i=0; i<threads.length; i++){
+            threads[i].start();
+        }
+
+
+    }
+
+    @Override
+    public void run() {
+        long startTime = System.currentTimeMillis();
+        BasicPacket packet = pcapParser.getPacket();
+        //System.out.println(packet);
+        while (packet != BasicPacket.EOF) {
+            if (!(packet instanceof IPPacket)) {
+                packet = pcapParser.getPacket();
+                continue;
+            }
+            System.out.println(packet);
+            packet = pcapParser.getPacket();
+        }
+        long endTime = System.currentTimeMillis();
+        //System.out.println("Execution time: " + (endTime - startTime));
+        System.out.println("Thread " + threadId + " exiting after: " + (endTime - startTime));
+    }
+
+    public void start ()
+    {
+        System.out.println("Starting " +  "Thread " + threadId);
+        if (t == null)
+        {
+            t = new Thread (this, String.valueOf(threadId));
+            t.start ();
+        }
+    }
+
+}

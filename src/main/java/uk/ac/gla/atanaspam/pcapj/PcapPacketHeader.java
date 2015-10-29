@@ -1,4 +1,4 @@
-package main.java.uk.ac.gla.atanaspam.pcapj;
+package uk.ac.gla.atanaspam.pcapj;
 
 /**
  * This class represents a packet header.
