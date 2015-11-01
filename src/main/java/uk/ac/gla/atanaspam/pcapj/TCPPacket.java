@@ -10,13 +10,13 @@ import java.util.Arrays;
  */
 public class TCPPacket extends IPPacket{
 
-    public int src_port;
-    public int dst_port;
-    public long seqNum;
-    public long ackNum;
-    public boolean[] flags;
+    protected int src_port;
+    protected int dst_port;
+    protected long seqNum;
+    protected long ackNum;
+    protected boolean[] flags;
 
-    public byte[] data;
+    protected byte[] data;
 
     public int getSrc_port() {
         return src_port;
@@ -119,10 +119,13 @@ public class TCPPacket extends IPPacket{
 
     public String toString(){
        return String.format(
+                /*
                 "-----TCP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +
-                        "DEST PORT: %d%nSEQ NUM: %d%nACK NUM: %d%nPAYLOAD LEN: %d%nFLAGS: %s%n",
+                        "DEST PORT: %d%nSEQ NUM: %d%nACK NUM: %d%nPAYLOAD LEN: %d%nFLAGS: %s%n", */
+               "-----TCP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +
+                       "DEST PORT: %d%nFLAGS: %s%n",
                 this.timestamp/1000, this.sourceMacAddress, this.destMacAddress, this.src_ip.getHostAddress(),
-               this.dst_ip.getHostAddress(), this.src_port, this.dst_port, this.seqNum, this.ackNum, this.data.length,
+               this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.seqNum, this.ackNum, this.data.length*/,
                Arrays.toString(this.flags));
     }
 

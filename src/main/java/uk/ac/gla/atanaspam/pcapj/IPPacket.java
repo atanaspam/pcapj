@@ -10,12 +10,12 @@ import java.util.Arrays;
  */
 public class IPPacket extends BasicPacket{
 
-    public long timestamp;
+    protected long timestamp;
     
-    public InetAddress src_ip;
-    public InetAddress dst_ip;
-    public String sourceMacAddress;
-    public String destMacAddress;
+    protected InetAddress src_ip;
+    protected InetAddress dst_ip;
+    protected String sourceMacAddress;
+    protected String destMacAddress;
 
     public long getTimestamp() {
         return timestamp;
@@ -100,6 +100,7 @@ public class IPPacket extends BasicPacket{
      * This constructor is only used by an external program using my library and can be safely removed.
      */
     public IPPacket(long timestamp, String srcMAC, String destMAC, InetAddress srcIP, InetAddress dstIP){
+        super();
         this.timestamp = timestamp;
         this.sourceMacAddress = srcMAC;
         this.destMacAddress = destMAC;

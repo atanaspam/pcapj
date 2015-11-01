@@ -13,9 +13,9 @@ public class UDPPacket extends IPPacket{
     final int inUDPHeaderSrcPortOffset = 0;
     final int inUDPHeaderDstPortOffset = 2;
 
-    public int src_port;
-    public int dst_port;
-    public byte[] data;
+    protected int src_port;
+    protected int dst_port;
+    protected byte[] data;
 
     public int getSrc_port() {
         return src_port;
@@ -74,23 +74,20 @@ public class UDPPacket extends IPPacket{
      * This constructor is only used by an external program using my library and can be safely removed.
      */
     public UDPPacket(long timestamp, String srcMAC, String destMAC, InetAddress srcIP, InetAddress dstIP, int srcPort,
-                     int destPort, boolean[] flags){
+                     int destPort){
 
-        super(timestamp);
-        this.timestamp = timestamp;
-        this.sourceMacAddress = srcMAC;
-        this.destMacAddress = destMAC;
-        this.src_ip = srcIP;
-        this.dst_ip = dstIP;
+        super(timestamp, srcMAC, destMAC, srcIP, dstIP);
         this.src_port = srcPort;
         this.dst_port = destPort;
     }
 
     public String toString(){
         return String.format(
+                /*"-----UDP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +
+                        "DEST PORT: %d%nPAYLOAD LEN: %d%n", */
                 "-----UDP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +
-                        "DEST PORT: %d%nPAYLOAD LEN: %d%n",
+                        "DEST PORT: %d%n",
                 this.timestamp/1000, this.sourceMacAddress, this.destMacAddress, this.src_ip.getHostAddress(),
-                this.dst_ip.getHostAddress(), this.src_port, this.dst_port, this.data.length);
+                this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.data.length*/);
     }
 }
