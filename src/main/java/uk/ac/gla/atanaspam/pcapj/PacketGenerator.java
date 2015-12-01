@@ -120,6 +120,29 @@ public class PacketGenerator {
     }
 
     /**
+     * This method sets new values to the field choices
+     * @param srcIP an ArrayList of possible Source IP addresses
+     * @param dstIP an ArrayList of possible Destination IP addresses
+     * @param srcPort an ArrayList of possible Source ports
+     * @param dstPort an ArrayList of possible Destination ports
+     * @param flags an ArrayList of possible TCP flags
+     * @param sig The integer representation of the current attack (pattern) simulated
+     * @param anomalyPercent the percentage of anomalous data in the data generated
+     */
+    public void set(ArrayList<InetAddress> srcIP, ArrayList<InetAddress> dstIP, ArrayList<Integer> srcPort,
+                          ArrayList<Integer> dstPort, ArrayList<boolean[]> flags, int sig, int anomalyPercent) {
+
+        this.anomalousTrafficPercentage = anomalyPercent;
+        packetsTillAnomaly = 100 / anomalousTrafficPercentage;
+        this.srcAddresses = srcIP;
+        this.dstAddresses = dstIP;
+        this.srcPorts = srcPort;
+        this.dstPorts = dstPort;
+        this.flags = flags;
+        this.signature = sig;
+    }
+
+    /**
      * This method returns a single packet that is part of a specific pattern
      * If anomalousTrafficPercentage is set to 1 this method iterates over the statically imported
      * data and does not introduce any patterns.
@@ -144,6 +167,10 @@ public class PacketGenerator {
             System.out.println(nextPacket);
             return packets.get(nextPacket);
         }
+    }
+
+    public void setAnomalousTrafficPercentage(int anomalousTrafficPercentage) {
+        this.anomalousTrafficPercentage = anomalousTrafficPercentage;
     }
 
     /**
