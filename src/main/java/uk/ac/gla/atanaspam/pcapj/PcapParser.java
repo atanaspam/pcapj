@@ -158,19 +158,6 @@ public class PcapParser{
 		final int udpMinPacketSize = 42;
 		final int tcpMinPacketSize = 54;
 
-        /*
-		PcapPacketHeader pcapPacketHeader = buildPcapPacketHeader();
-		if(pcapPacketHeader == null)
-			return BasicPacket.EOF;
-
-		byte[] packet = new byte[(int)pcapPacketHeader.packetSize];
-		if(this.readBytes(packet) < 0)
-			return BasicPacket.EOF;
-        if (verbose) {
-            System.out.println("----------------------  Packet ----------------------");
-            System.out.println(javax.xml.bind.DatatypeConverter.printHexBinary(packet));
-        }
-        */
         RawPacket raw = readPacket();
         if (raw == null){
             return BasicPacket.EOF;
