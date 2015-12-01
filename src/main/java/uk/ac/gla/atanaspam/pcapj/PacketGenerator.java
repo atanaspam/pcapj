@@ -93,8 +93,8 @@ public class PacketGenerator {
                           ArrayList<Integer> dstPort, ArrayList<boolean[]> flags, int sig){
         switch (sig){
             case 0: {
-                // Custom, only import contents from settngs.
-                break;
+                anomalousTrafficPercentage = 1;
+                return;
             }
             case 1:{
                 // Simulate a DOS attack
@@ -110,10 +110,18 @@ public class PacketGenerator {
             }
             case 2: {
                 // Simulate a DDOS attack
+                return;
             }
 
             case 3: {
-                //Simulate a SYN flood
+                // Simulate a SYN flood attack
+                return;
+            }
+            case 4: {
+                // Simulate Invalid flags
+            }
+            case 5: {
+                // Simulate an Application layer attack
             }
         }
 
