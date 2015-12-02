@@ -172,7 +172,6 @@ public class PacketGenerator {
         else{
             packetsTillAnomaly--;
             nextPacket = nextPacket++ % packets.size();
-            System.out.println(nextPacket);
             return packets.get(nextPacket);
         }
     }
