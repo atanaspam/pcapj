@@ -62,7 +62,7 @@ public class PacketGenerator {
         nextSrcPort = 0;
         nextPacket = 0;
         PcapParser pcapParser = new PcapParser();
-        if(pcapParser.openFile("/Users/atanaspam/Desktop/DumpFile03.pcap") < 0){
+        if(pcapParser.openFile("/Users/atanaspam/Desktop/DumpFile02.pcap") < 0){
             System.err.println("Failed to open  file" + ", exiting.");
             return;
         }
@@ -70,11 +70,11 @@ public class PacketGenerator {
         while(packet != BasicPacket.EOF){
             if(!(packet instanceof IPPacket)){
                 packet = pcapParser.getPacket();
-                //packets.add(packet);
                 continue;
             }
-            packet = pcapParser.getPacket();
             packets.add(packet);
+            packet = pcapParser.getPacket();
+
         }
         System.out.println("Added "+ packets.size() + " packets");
 
@@ -171,7 +171,7 @@ public class PacketGenerator {
         }
         else{
             packetsTillAnomaly--;
-            nextPacket = nextPacket++ % packets.size();
+            nextPacket = ++nextPacket % packets.size();
             return packets.get(nextPacket);
         }
     }
@@ -188,7 +188,7 @@ public class PacketGenerator {
         PacketGenerator p = new PacketGenerator();
         p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
                 new ArrayList<boolean[]>(), 1);
-        for (int i=0; i<100; i++){
+        for (int i=0; i<400; i++){
             System.out.println(p.getPacket());
         }
     }
