@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * This class implements the capability to introduce patterns into the already exported
- * data set. This is done by injecting a packet that has pre-define values for fields
+ * data set. This is done by injecting a packet that has pre-defined values for fields
  * at a varying frequency, thus creating the pattern.
  * @author atanaspam
  * @created 15/11/2015
@@ -62,7 +62,9 @@ public class PacketGenerator {
         nextSrcPort = 0;
         nextPacket = 0;
         PcapParser pcapParser = new PcapParser();
-        if(pcapParser.openFile("/Users/atanaspam/Desktop/DumpFile02.pcap") < 0){
+        pcapParser.setVlanEnabled(true);
+        // /Users/atanaspam/Desktop/partial.pcap
+        if(pcapParser.openFile("/Users/atanaspam/Desktop/partial.pcap") < 0) {
             System.err.println("Failed to open  file" + ", exiting.");
             return;
         }

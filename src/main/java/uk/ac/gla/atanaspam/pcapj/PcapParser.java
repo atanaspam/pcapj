@@ -1,4 +1,5 @@
 package uk.ac.gla.atanaspam.pcapj;
+import javax.rmi.CORBA.Util;
 import java.io.*;
 import java.lang.Exception;
 import java.util.Arrays;
@@ -15,9 +16,24 @@ public class PcapParser{
 	public static final int globalHeaderSize = 24;
 
 	private FileInputStream fis;
+    private Utils utils;
     private boolean verbose = false;
+	private boolean vlanEnabled = false;
 
-    /**
+	public void setVlanEnabled(boolean value) {
+		if (value){
+            Utils.etherHeaderLength = Utils.etherHeaderLength + Utils.vlanHeaderLength;
+            Utils.etherTypeOffset = Utils.etherTypeOffset + Utils.vlanHeaderLength;
+            Utils.verIHLOffset = Utils.verIHLOffset + Utils.vlanHeaderLength;
+		} else if (this.vlanEnabled && !value){
+            Utils.etherHeaderLength = Utils.etherHeaderLength - Utils.vlanHeaderLength;
+            Utils.etherTypeOffset = Utils.etherTypeOffset - Utils.vlanHeaderLength;
+            Utils.verIHLOffset = Utils.verIHLOffset - Utils.vlanHeaderLength;
+		}
+		this.vlanEnabled = value;
+	}
+
+	/**
      * Set the verbosity level.
      * @param newVerbose the new setting.
      */
@@ -139,8 +155,9 @@ public class PcapParser{
 	private BasicPacket buildPacket(byte[] packet, long timestamp){
 		if(Utils.isUDPPacket(packet))
 			return new UDPPacket(packet, timestamp);
-		else if(Utils.isTCPPacket(packet))
+		else if(Utils.isTCPPacket(packet)) {
 			return new TCPPacket(packet, timestamp);
+		}
 		else if(Utils.isIPPacket(packet))
 			return new IPPacket(packet, timestamp);
 		else
@@ -163,7 +180,6 @@ public class PcapParser{
             return BasicPacket.EOF;
         }
         else {
-
             if ((Utils.isUDPPacket(raw.getPacket()) && (raw.getPacket().length < udpMinPacketSize)) ||
                     (Utils.isTCPPacket(raw.getPacket()) && (raw.getPacket().length < tcpMinPacketSize)))
                 return new BasicPacket(Utils.getProtocolType(raw.getPacket()));
@@ -177,7 +193,6 @@ public class PcapParser{
         PcapPacketHeader pcapPacketHeader = buildPcapPacketHeader();
         if(pcapPacketHeader == null)
             return null;
-
         byte[] packet = new byte[(int)pcapPacketHeader.packetSize];
         if(this.readBytes(packet) < 0)
             return null;

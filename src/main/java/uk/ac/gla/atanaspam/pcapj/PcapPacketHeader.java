@@ -14,4 +14,11 @@ public class PcapPacketHeader{
     public long timestamp;
     public long packetSize;
 
+    @Override
+    public String toString() {
+        return "PcapPacketHeader{" +
+                "timestamp=" + timestamp +
+                ", packetSize=" + packetSize +
+                '}';
+    }
 }

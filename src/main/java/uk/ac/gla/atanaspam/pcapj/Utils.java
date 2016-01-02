@@ -7,19 +7,21 @@ package uk.ac.gla.atanaspam.pcapj;
  */
 public class Utils {
 
-    public static final int etherHeaderLength = 14;
-    public static final int etherTypeOffset = 12;
-    public static final int etherTypeIPv4 = 0x800;
-    public static final int etherTypeIPv6 = 0x86DD;
-    public static final int verIHLOffset = 14;
-    public static final int ipProtoOffset = 23;
+    public static int vlanHeaderLength = 4;
+    public static int etherHeaderLength = 14;
     public static final int udpHeaderLength = 8;
 
-    public static final int ipSrcOffset = 26;
-    public static final int ipDstOffset = 30;
+    public static int verIHLOffset = etherHeaderLength; // the offset is the same as the ether header end
+    public static int etherTypeOffset = 12;
+    public static final int ipProtoOffset = 9; //Offset from etherHeader end
+    public static final int ipSrcOffset = 12; //Offset from etherHeader end
+    public static final int ipDstOffset = 16; //Offset from etherHeader end
 
     public static final int ipProtoTCP = 6;
     public static final int ipProtoUDP = 17;
+    public static final int etherTypeIPv4 = 0x800;
+    public static final int etherTypeIPv6 = 0x86DD;
+
 
 
     /**
@@ -28,7 +30,7 @@ public class Utils {
      * @return a String representing the hex Ethertype code.
      */
     public static String getProtocolType(byte[] packet){
-        return Integer.toHexString(packet[ipProtoOffset]);
+        return Integer.toHexString(packet[ipProtoOffset + etherHeaderLength]);
     }
 
 
@@ -148,7 +150,7 @@ public class Utils {
     public static boolean isUDPPacket(byte[] packet){
         if(!isIPPacket(packet))
             return false;
-        return packet[ipProtoOffset] == ipProtoUDP;
+        return packet[ipProtoOffset + etherHeaderLength] == ipProtoUDP;
     }
 
     /**
@@ -159,7 +161,7 @@ public class Utils {
     public static boolean isTCPPacket(byte[] packet){
         if(!isIPPacket(packet))
             return false;
-        return packet[ipProtoOffset] == ipProtoTCP;
+        return packet[ipProtoOffset + etherHeaderLength] == ipProtoTCP;
     }
 
     /**
