@@ -93,29 +93,40 @@ public class PacketGenerator {
      */
     public void configure(ArrayList<InetAddress> srcIP, ArrayList<InetAddress> dstIP, ArrayList<Integer> srcPort,
                           ArrayList<Integer> dstPort, ArrayList<boolean[]> flags, int sig){
-        switch (sig){
+        for (boolean[] a : flags){ flags.add(a);}
+        for (InetAddress a : srcIP){ srcAddresses.add(a);}
+        for (InetAddress a : dstIP){ dstAddresses.add(a);}
+        for(Integer n : srcPort){ srcPorts.add(n);}
+        for(Integer n : dstPort){ dstPorts.add(n);}
+
+        switch (sig) {
             case 0: {
+                // Disable
                 anomalousTrafficPercentage = 1;
                 return;
             }
-            case 1:{
+            case 1: {
                 // Simulate a DOS attack
                 signature = 1;
-                anomalousTrafficPercentage = 20;
-                packetsTillAnomaly = 100 / anomalousTrafficPercentage;
-                for (boolean[] a : flags){ flags.add(a);}
-                for (InetAddress a : srcIP){ srcAddresses.add(a);}
-                for (InetAddress a : dstIP){ dstAddresses.add(a);}
-                for(Integer n : srcPort){ srcPorts.add(n);}
-                for(Integer n : dstPort){ dstPorts.add(n);}
                 return;
             }
             case 2: {
                 // Simulate a DDOS attack
+                signature = 2;
+                try {
+                    for (byte i = 0; i < 127; i++) {
+                        byte[] ipAddr = new byte[]{0, 0, 0, i};
+                        InetAddress addr = InetAddress.getByAddress(ipAddr);
+                        srcAddresses.add(addr);
+                    }
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
                 return;
             }
 
             case 3: {
+                signature = 3;
                 // Simulate a SYN flood attack
                 return;
             }
@@ -160,26 +171,35 @@ public class PacketGenerator {
      */
     public BasicPacket getPacket(){
         if (packetsTillAnomaly == 1 && anomalousTrafficPercentage != 1){
-            TCPPacket p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF",
-                    srcAddresses.get(nextSrcAddress), dstAddresses.get(nextDstAddress), srcPorts.get(nextSrcPort),
-                    dstPorts.get(nextDstPort), flags.get(nextFlag));
-            nextSrcAddress = nextSrcAddress++ % srcAddresses.size();
-            nextDstAddress = nextDstAddress++ % dstAddresses.size();
-            nextSrcPort = nextSrcPort++ % srcPorts.size();
-            nextDstPort = nextDstPort++ % dstPorts.size();
-            nextFlag = nextFlag++ % flags.size();
-            packetsTillAnomaly = 100 /anomalousTrafficPercentage;
-            return p;
+            return getAnomalousPacket();
         }
         else{
-            packetsTillAnomaly--;
-            nextPacket = ++nextPacket % packets.size();
-            return packets.get(nextPacket);
+            return getOrdinaryPacket();
         }
     }
 
     public void setAnomalousTrafficPercentage(int anomalousTrafficPercentage) {
         this.anomalousTrafficPercentage = anomalousTrafficPercentage;
+    }
+
+    private BasicPacket getAnomalousPacket(){
+        //IPPacket sample = (IPPacket) packets.get(nextPacket);
+        TCPPacket p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF",
+                srcAddresses.get(nextSrcAddress), dstAddresses.get(nextDstAddress), srcPorts.get(nextSrcPort),
+                dstPorts.get(nextDstPort), flags.get(nextFlag));
+        nextSrcAddress = nextSrcAddress++ % srcAddresses.size();
+        nextDstAddress = nextDstAddress++ % dstAddresses.size();
+        nextSrcPort = nextSrcPort++ % srcPorts.size();
+        nextDstPort = nextDstPort++ % dstPorts.size();
+        nextFlag = nextFlag++ % flags.size();
+        packetsTillAnomaly = 100 /anomalousTrafficPercentage;
+        return p;
+    }
+
+    private BasicPacket getOrdinaryPacket(){
+        packetsTillAnomaly--;
+        nextPacket = ++nextPacket % packets.size();
+        return packets.get(nextPacket);
     }
 
     /**

@@ -14,8 +14,6 @@ public class Utils {
     public static int verIHLOffset = etherHeaderLength; // the offset is the same as the ether header end
     public static int etherTypeOffset = 12;
     public static final int ipProtoOffset = 9; //Offset from etherHeader end
-    public static final int ipSrcOffset = 12; //Offset from etherHeader end
-    public static final int ipDstOffset = 16; //Offset from etherHeader end
 
     public static final int ipProtoTCP = 6;
     public static final int ipProtoUDP = 17;

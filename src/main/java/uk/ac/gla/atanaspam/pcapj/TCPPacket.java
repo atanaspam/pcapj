@@ -70,7 +70,7 @@ public class TCPPacket extends IPPacket{
         final int inTCPHeaderDstPortOffset = 2;
         final int inTCPHeaderSeqNumOffset = 4;
         final int inTCPHeaderAckNumOffset = 8;
-        final int flagsOffset = 12;
+        final int flagsOffset = 13;
 
         int ipHeaderLenght = Utils.getIPHeaderLength(packet);
 
@@ -121,9 +121,11 @@ public class TCPPacket extends IPPacket{
        return String.format(
                 /*
                 "-----TCP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +
-                        "DEST PORT: %d%nSEQ NUM: %d%nACK NUM: %d%nPAYLOAD LEN: %d%nFLAGS: %s%n", */
+                        "DEST PORT: %d%nSEQ NUM: %d%nACK NUM: %d%nPAYLOAD LEN: %d%nFLAGS: %s%n",
+               */
                "-----TCP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +
                        "DEST PORT: %d%nFLAGS: %s%n",
+
                 this.timestamp/1000, this.sourceMacAddress, this.destMacAddress, this.src_ip.getHostAddress(),
                this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.seqNum, this.ackNum, this.data.length*/,
                Arrays.toString(this.flags));

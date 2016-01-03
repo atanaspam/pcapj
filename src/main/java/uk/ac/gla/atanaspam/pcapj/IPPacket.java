@@ -10,8 +10,10 @@ import java.util.Arrays;
  */
 public class IPPacket extends BasicPacket{
 
+    final int ipSrcOffset = 12; //Offset from etherHeader end
+    final int ipDstOffset = 16; //Offset from etherHeader end
+
     protected long timestamp;
-    
     protected InetAddress src_ip;
     protected InetAddress dst_ip;
     protected String sourceMacAddress;
@@ -73,11 +75,11 @@ public class IPPacket extends BasicPacket{
          * Copy the source IP address from the raw data and parse it.
          */
         byte[] srcIP = new byte[4];
-        System.arraycopy(packet, Utils.ipSrcOffset,
+        System.arraycopy(packet, ipSrcOffset + Utils.etherHeaderLength,
                 srcIP, 0, srcIP.length);
         try{
             this.src_ip = InetAddress.getByAddress(srcIP);
-        }catch(Exception e){
+        }catch(Exception e) {
             System.out.println("An error occured while parsing the src_ip address.");
             //return null;
         }
@@ -86,7 +88,7 @@ public class IPPacket extends BasicPacket{
          * Copy the dest IP address from the raw data and parse it.
          */
         byte[] dstIP = new byte[4];
-        System.arraycopy(packet, Utils.ipDstOffset,
+        System.arraycopy(packet, ipDstOffset + Utils.etherHeaderLength,
                 dstIP, 0, dstIP.length);
         try{
             this.dst_ip = InetAddress.getByAddress(dstIP);
