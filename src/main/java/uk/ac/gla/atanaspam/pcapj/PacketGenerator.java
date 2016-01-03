@@ -41,7 +41,7 @@ public class PacketGenerator {
         this.anomalousTrafficPercentage = 10;
         packetsTillAnomaly = 100 / anomalousTrafficPercentage;
         this.flags = new ArrayList<boolean[]>();
-        boolean[] flag ={false,false,false,false,false,false};
+        boolean[] flag ={false,false,false,true,false,false,true,false};
         flags.add(flag);
         this.srcAddresses = new ArrayList<InetAddress>();
         this.dstAddresses = new ArrayList<InetAddress>();
@@ -126,15 +126,25 @@ public class PacketGenerator {
             }
 
             case 3: {
-                signature = 3;
                 // Simulate a SYN flood attack
+                signature = 3;
+                flags.clear();
+                flags.add(new boolean[]{false,false,false,false,false,false,true,false});
                 return;
             }
             case 4: {
                 // Simulate Invalid flags
+                flags.clear();
+                // Since no flag is set, this is an invalid combination.
+                flags.add(new boolean[]{false,false,false,false,false,false,false,false});
             }
             case 5: {
-                // Simulate an Application layer attack
+                // Simulate an Application layer attack ()
+            }
+            default: {
+                // Disable
+                anomalousTrafficPercentage = 1;
+                return;
             }
         }
 
@@ -187,11 +197,11 @@ public class PacketGenerator {
         TCPPacket p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF",
                 srcAddresses.get(nextSrcAddress), dstAddresses.get(nextDstAddress), srcPorts.get(nextSrcPort),
                 dstPorts.get(nextDstPort), flags.get(nextFlag));
-        nextSrcAddress = nextSrcAddress++ % srcAddresses.size();
-        nextDstAddress = nextDstAddress++ % dstAddresses.size();
-        nextSrcPort = nextSrcPort++ % srcPorts.size();
-        nextDstPort = nextDstPort++ % dstPorts.size();
-        nextFlag = nextFlag++ % flags.size();
+        nextSrcAddress = ++nextSrcAddress % srcAddresses.size();
+        nextDstAddress = ++nextDstAddress % dstAddresses.size();
+        nextSrcPort = ++nextSrcPort % srcPorts.size();
+        nextDstPort = ++nextDstPort % dstPorts.size();
+        nextFlag = ++nextFlag % flags.size();
         packetsTillAnomaly = 100 /anomalousTrafficPercentage;
         return p;
     }
@@ -209,7 +219,7 @@ public class PacketGenerator {
     public static void main (String[] args){
         PacketGenerator p = new PacketGenerator();
         p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
-                new ArrayList<boolean[]>(), 1);
+                new ArrayList<boolean[]>(), 2);
         for (int i=0; i<400; i++){
             System.out.println(p.getPacket());
         }
