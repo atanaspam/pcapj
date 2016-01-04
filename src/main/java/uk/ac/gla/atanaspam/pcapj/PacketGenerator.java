@@ -1,6 +1,9 @@
 package uk.ac.gla.atanaspam.pcapj;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -16,6 +19,7 @@ import java.util.ArrayList;
 
 public class PacketGenerator {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PacketGenerator.class);
     int signature;
     int anomalousTrafficPercentage;
     ArrayList<boolean[]> flags;
@@ -35,7 +39,7 @@ public class PacketGenerator {
     /**
      * A constructor that sets default values for all settings.
      */
-    public PacketGenerator(){
+    public PacketGenerator(String path, boolean vlanEnabled, boolean verbose){
         packets = new ArrayList<BasicPacket>();
         this.signature = 0;
         this.anomalousTrafficPercentage = 10;
@@ -62,11 +66,11 @@ public class PacketGenerator {
         nextSrcPort = 0;
         nextPacket = 0;
         PcapParser pcapParser = new PcapParser();
-        pcapParser.setVlanEnabled(true);
-        // /Users/atanaspam/Desktop/partial.pcap
-        if(pcapParser.openFile("/Users/atanaspam/Desktop/partial.pcap") < 0) {
-            System.err.println("Failed to open  file" + ", exiting.");
-            return;
+        pcapParser.setVlanEnabled(vlanEnabled);
+        pcapParser.setVerbose(verbose);
+        if(pcapParser.openFile(path) < 0) {
+            LOG.error("Failed to open  file" + ", exiting.");
+            System.exit(-1);
         }
         BasicPacket packet = pcapParser.getPacket();
         while(packet != BasicPacket.EOF){
@@ -78,7 +82,7 @@ public class PacketGenerator {
             packet = pcapParser.getPacket();
 
         }
-        System.out.println("Added "+ packets.size() + " packets");
+        LOG.info("Added "+ packets.size() + " packets");
 
     }
 
@@ -217,7 +221,7 @@ public class PacketGenerator {
      * @param args
      */
     public static void main (String[] args){
-        PacketGenerator p = new PacketGenerator();
+        PacketGenerator p = new PacketGenerator("/Users/atanaspam/Desktop/partial.pcap", true, false);
         p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
                 new ArrayList<boolean[]>(), 2);
         for (int i=0; i<400; i++){

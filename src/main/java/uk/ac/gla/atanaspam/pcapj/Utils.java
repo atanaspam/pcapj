@@ -1,11 +1,16 @@
 package uk.ac.gla.atanaspam.pcapj;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class stores various constants and auxiliary methods used to parse packets
  * @author atanaspam
  * @version 0.4
  */
 public class Utils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
     public static int vlanHeaderLength = 4;
     public static int etherHeaderLength = 14;
@@ -109,9 +114,7 @@ public class Utils {
         StringBuilder str = null;
         try {
             String rawString = javax.xml.bind.DatatypeConverter.printHexBinary(source);
-            //System.out.println(a);
             str = new StringBuilder(rawString);
-            //System.out.println(str);
             int n = 0;
             for (int i=0; i<str.length(); i++){
                 if (n==2){
@@ -124,7 +127,7 @@ public class Utils {
             }
 
         }catch (Exception e){
-            System.out.println("An error has occured while parsing a MAC address");
+            LOG.error("An error has occured while parsing a MAC address");
         }
 
         return str.toString();

@@ -1,4 +1,7 @@
 package uk.ac.gla.atanaspam.pcapj;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.rmi.CORBA.Util;
 import java.io.*;
 import java.lang.Exception;
@@ -11,6 +14,8 @@ import java.util.Arrays;
  * @version 0.5
  */
 public class PcapParser{
+
+	private static final Logger LOG = LoggerFactory.getLogger(PcapParser.class);
 
 	public static final long pcapMagicNumber = 0xA1B2C3D4;
 	public static final int globalHeaderSize = 24;
@@ -39,6 +44,10 @@ public class PcapParser{
      */
     public void setVerbose(boolean newVerbose){
         this.verbose = newVerbose;
+        if(newVerbose)
+		    LOG.info("Verbose Mode enabled");
+        else
+            LOG.info("Verbose Mode disabled");
     }
 
     /**
@@ -61,7 +70,7 @@ public class PcapParser{
 			try{
 				read = this.fis.read(data, offset, data.length - offset);
 			}catch(Exception e){
-                System.out.println("An error occurred while reading from the file : " + e.getMessage());
+                LOG.error("An error occurred while reading from the file : " + e.getMessage());
 				break;
 			}
 			if(read == -1)
@@ -69,8 +78,10 @@ public class PcapParser{
 
 			offset = offset + read;
 		}
-		if(read != data.length)
-			return -1;
+		if(read != data.length) {
+            LOG.error("Could not read from file. File may be corrupted.");
+            return -1;
+        }
 		else
 			return 0;
 	}
@@ -88,11 +99,13 @@ public class PcapParser{
             return -1;
         }
         if (verbose) {
-            //System.out.println("Trafic type: " + Utils.convertInt(globalHeader, globalHeaderSize-4));
-            System.out.println("------------------------  Global Header ------------------------");
-            System.out.println(javax.xml.bind.DatatypeConverter.printHexBinary(globalHeader));
+            //LOG.info("Trafic type: " + Utils.convertInt(globalHeader, globalHeaderSize-4));
+            String header = String.format("Global Header : %s",
+                    javax.xml.bind.DatatypeConverter.printHexBinary(globalHeader));
+           LOG.info(header);
         }
 		if(Utils.convertInt(globalHeader) != pcapMagicNumber) {
+            LOG.error("PCAP file has wrong endianness");
             return -2;
         }
 		return 0;
@@ -107,10 +120,9 @@ public class PcapParser{
 		try{
 			this.fis = new FileInputStream(new File(path));
 		}catch(Exception e){
-			e.printStackTrace();
+			LOG.error("Could not read from file, please check the path.");
 			return -1;
 		}
-
 		if(this.readGlobalHeader() < 0)
 			return -1;
 		else
@@ -129,10 +141,7 @@ public class PcapParser{
 		byte[] header = new byte[PcapPacketHeader.pcapPacketHeaderSize];
 		if(this.readBytes(header) < 0)
 			return null;
-        if (verbose) {
-            System.out.println("---------------------- PCAP Packet Header ----------------------");
-            System.out.println(javax.xml.bind.DatatypeConverter.printHexBinary(header));
-        }
+
 		PcapPacketHeader pcapPacketHeader = new PcapPacketHeader();
 		pcapPacketHeader.timestamp =
 				(Utils.convertInt(header, inPcapPacketHeaderSecOffset) * 1000) +
@@ -140,6 +149,11 @@ public class PcapParser{
 
 		pcapPacketHeader.packetSize =
 				Utils.convertInt(header, PcapPacketHeader.capLenOffset);
+        if (verbose) {
+            String packetHeader = String.format("PCAP Packet Header : %s",
+                    javax.xml.bind.DatatypeConverter.printHexBinary(header));
+            LOG.info(packetHeader);
+        }
 
 		return pcapPacketHeader;
 	}
@@ -153,15 +167,30 @@ public class PcapParser{
      * @return the packet generated which can be UDPPacket, TCPPacket or BasicPacket
      */
 	private BasicPacket buildPacket(byte[] packet, long timestamp){
-		if(Utils.isUDPPacket(packet))
-			return new UDPPacket(packet, timestamp);
+		if(Utils.isUDPPacket(packet)){
+            UDPPacket p = new UDPPacket(packet, timestamp);
+            if (verbose)
+                LOG.info(p.toString());
+            return p;
+        }
 		else if(Utils.isTCPPacket(packet)) {
-			return new TCPPacket(packet, timestamp);
+			TCPPacket p = new TCPPacket(packet, timestamp);
+            if (verbose)
+                LOG.info(p.toString());
+            return p;
 		}
-		else if(Utils.isIPPacket(packet))
-			return new IPPacket(packet, timestamp);
-		else
-			return new BasicPacket(Utils.getProtocolType(packet));
+		else if(Utils.isIPPacket(packet)) {
+            IPPacket p =  new IPPacket(packet, timestamp);
+            if (verbose)
+                LOG.info(p.toString());
+            return p;
+        }
+		else {
+            BasicPacket p = new BasicPacket(Utils.getProtocolType(packet));
+            if (verbose)
+                LOG.info(p.toString());
+            return p;
+        }
 	}
 
     /**
@@ -197,8 +226,9 @@ public class PcapParser{
         if(this.readBytes(packet) < 0)
             return null;
         if (verbose) {
-            System.out.println("----------------------  Packet ----------------------");
-            System.out.println(javax.xml.bind.DatatypeConverter.printHexBinary(packet));
+            String packetStr = String.format("Packet : %s",
+                    javax.xml.bind.DatatypeConverter.printHexBinary(packet));
+            LOG.info(packetStr);
         }
 
         return new RawPacket(packet, pcapPacketHeader);
@@ -211,7 +241,7 @@ public class PcapParser{
 		try{
 			fis.close();
 		}catch(Exception e){
-			System.out.println("Unable to close file.");
+			LOG.warn("Unable to close file.");
 		}
 	}
 }
