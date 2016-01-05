@@ -1,7 +1,6 @@
 package uk.ac.gla.atanaspam.pcapj;
 
 import java.net.InetAddress;
-import java.util.Arrays;
 
 /**
  * This class represents a UDP packet and stores all the data that we are interested in for a UDP packet
@@ -74,13 +73,15 @@ public class UDPPacket extends IPPacket{
      * This constructor is only used by an external program using my library and can be safely removed.
      */
     public UDPPacket(long timestamp, String srcMAC, String destMAC, InetAddress srcIP, InetAddress dstIP, int srcPort,
-                     int destPort){
+                     int destPort, byte[] data){
 
         super(timestamp, srcMAC, destMAC, srcIP, dstIP);
         this.src_port = srcPort;
         this.dst_port = destPort;
+        this.data = data;
     }
 
+    @Override
     public String toString(){
         return String.format(
                 /*"-----UDP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +

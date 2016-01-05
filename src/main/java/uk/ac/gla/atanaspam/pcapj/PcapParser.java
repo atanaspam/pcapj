@@ -1,11 +1,10 @@
 package uk.ac.gla.atanaspam.pcapj;
+
+import java.io.FileInputStream;
+import java.io.File;
+import java.lang.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.rmi.CORBA.Util;
-import java.io.*;
-import java.lang.Exception;
-import java.util.Arrays;
 
 /**
  * This class is the entry point for that module.
@@ -25,6 +24,11 @@ public class PcapParser{
     private boolean verbose = false;
 	private boolean vlanEnabled = false;
 
+    /**
+     * Specify if the packets processed contain a 802.1Q Header
+     * This reflects on the constants specified in the Utils class
+     * @param value the new setting
+     */
 	public void setVlanEnabled(boolean value) {
 		if (value){
             Utils.etherHeaderLength = Utils.etherHeaderLength + Utils.vlanHeaderLength;
@@ -45,9 +49,9 @@ public class PcapParser{
     public void setVerbose(boolean newVerbose){
         this.verbose = newVerbose;
         if(newVerbose)
-		    LOG.info("Verbose Mode enabled");
+		    LOG.debug("Verbose Mode enabled");
         else
-            LOG.info("Verbose Mode disabled");
+            LOG.debug("Verbose Mode disabled");
     }
 
     /**

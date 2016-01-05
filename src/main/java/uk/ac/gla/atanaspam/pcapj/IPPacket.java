@@ -1,7 +1,9 @@
 package uk.ac.gla.atanaspam.pcapj;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.*;
-import java.util.Arrays;
 
 /**
  * This class stores data extracted from an Ethernet frame.
@@ -9,6 +11,8 @@ import java.util.Arrays;
  * @version 0.4
  */
 public class IPPacket extends BasicPacket{
+
+    private static final Logger LOG = LoggerFactory.getLogger(IPPacket.class);
 
     final int ipSrcOffset = 12; //Offset from etherHeader end
     final int ipDstOffset = 16; //Offset from etherHeader end
@@ -80,8 +84,7 @@ public class IPPacket extends BasicPacket{
         try{
             this.src_ip = InetAddress.getByAddress(srcIP);
         }catch(Exception e) {
-            System.out.println("An error occured while parsing the src_ip address.");
-            //return null;
+            LOG.error("An error occured while parsing the src_ip address.");
         }
 
         /**
@@ -93,8 +96,7 @@ public class IPPacket extends BasicPacket{
         try{
             this.dst_ip = InetAddress.getByAddress(dstIP);
         }catch(Exception e){
-            System.out.println("An error occured while parsing the src_ip address.");
-            //return null;
+            LOG.error("An error occurred while parsing the src_ip address.");
         }
     }
 
@@ -111,10 +113,7 @@ public class IPPacket extends BasicPacket{
 
     }
 
-    /**
-     * A simple toString method.
-     * @return A String representing everything we know about this packet.
-     */
+    @Override
     public String toString(){
         return String.format(
                 "-----PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%n",

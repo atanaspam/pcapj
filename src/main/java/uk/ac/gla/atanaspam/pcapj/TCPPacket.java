@@ -108,15 +108,17 @@ public class TCPPacket extends IPPacket{
      * This constructor is only used by an external program using my library and can be safely removed.
      */
     public TCPPacket(long timestamp, String srcMAC, String destMAC, InetAddress srcIP, InetAddress dstIP, int srcPort,
-                    int destPort, boolean[] flags){
+                    int destPort, boolean[] flags, byte[] data){
 
         super(timestamp,srcMAC, destMAC,srcIP, dstIP);
         this.src_port = srcPort;
         this.dst_port = destPort;
         this.flags = flags;
+        this.data = data;
 
     }
 
+    @Override
     public String toString(){
        return String.format(
                 /*
