@@ -12,6 +12,7 @@ public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
+    public static final int globalHeaderLength = 24;
     public static int vlanHeaderLength = 4;
     public static int etherHeaderLength = 14;
     public static final int udpHeaderLength = 8;
@@ -24,6 +25,7 @@ public class Utils {
     public static final int ipProtoUDP = 17;
     public static final int etherTypeIPv4 = 0x800;
     public static final int etherTypeIPv6 = 0x86DD;
+    public static final long pcapMagicNumber = 0xA1B2C3D4;
 
 
 

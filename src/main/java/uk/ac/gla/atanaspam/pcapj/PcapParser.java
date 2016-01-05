@@ -1,7 +1,6 @@
 package uk.ac.gla.atanaspam.pcapj;
 
-import java.io.FileInputStream;
-import java.io.File;
+import java.io.*;
 import java.lang.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +15,14 @@ public class PcapParser{
 
 	private static final Logger LOG = LoggerFactory.getLogger(PcapParser.class);
 
-	public static final long pcapMagicNumber = 0xA1B2C3D4;
-	public static final int globalHeaderSize = 24;
-
-	private FileInputStream fis;
-    private Utils utils;
+    private RandomAccessFile raf;
     private boolean verbose = false;
 	private boolean vlanEnabled = false;
+    private long fileOffset;
+
+    public PcapParser(){
+        fileOffset = 0;
+    }
 
     /**
      * Specify if the packets processed contain a 802.1Q Header
@@ -72,7 +72,8 @@ public class PcapParser{
 		int read = -1;
 		while(offset != data.length){
 			try{
-				read = this.fis.read(data, offset, data.length - offset);
+                raf.seek(fileOffset);
+				read = this.raf.read(data, offset, data.length - offset);
 			}catch(Exception e){
                 LOG.error("An error occurred while reading from the file : " + e.getMessage());
 				break;
@@ -81,7 +82,9 @@ public class PcapParser{
 				break;
 
 			offset = offset + read;
-		}
+            fileOffset = fileOffset + read;
+        }
+        //LOG.info(fileOffset+"");
 		if(read != data.length) {
             LOG.error("Could not read from file. File may be corrupted.");
             return -1;
@@ -97,18 +100,18 @@ public class PcapParser{
      * is not recognised.
      */
 	private int readGlobalHeader(){
-		byte[] globalHeader = new byte[globalHeaderSize];
+		byte[] globalHeader = new byte[Utils.globalHeaderLength];
 
 		if(this.readBytes(globalHeader) == -1) {
             return -1;
         }
         if (verbose) {
-            //LOG.info("Trafic type: " + Utils.convertInt(globalHeader, globalHeaderSize-4));
+            //LOG.info("Trafic type: " + Utils.convertInt(globalHeader, UtglobalHeaderSize-4));
             String header = String.format("Global Header : %s",
                     javax.xml.bind.DatatypeConverter.printHexBinary(globalHeader));
            LOG.info(header);
         }
-		if(Utils.convertInt(globalHeader) != pcapMagicNumber) {
+		if(Utils.convertInt(globalHeader) != Utils.pcapMagicNumber) {
             LOG.error("PCAP file has wrong endianness");
             return -2;
         }
@@ -122,8 +125,8 @@ public class PcapParser{
      */
 	public int openFile(String path){
 		try{
-			this.fis = new FileInputStream(new File(path));
-		}catch(Exception e){
+            this.raf = new RandomAccessFile(new File(path), "r");
+		}catch(FileNotFoundException e){
 			LOG.error("Could not read from file, please check the path.");
 			return -1;
 		}
@@ -243,7 +246,7 @@ public class PcapParser{
      */
 	public void closeFile(){
 		try{
-			fis.close();
+			raf.close();
 		}catch(Exception e){
 			LOG.warn("Unable to close file.");
 		}
