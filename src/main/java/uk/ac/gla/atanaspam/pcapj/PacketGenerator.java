@@ -75,6 +75,7 @@ public class PacketGenerator {
         BasicPacket packet = pcapParser.getPacket();
         while(packet != BasicPacket.EOF){
             if(!(packet instanceof IPPacket)){
+                //LOG.warn("Processed an unknown packet");
                 packet = pcapParser.getPacket();
                 continue;
             }
@@ -221,7 +222,7 @@ public class PacketGenerator {
      * @param args
      */
     public static void main (String[] args){
-        PacketGenerator p = new PacketGenerator("/Users/atanaspam/Documents/Versoned Projects/RTDCONN/partial.pcap", true, false);
+        PacketGenerator p = new PacketGenerator("/Users/atanaspam/Documents/Versoned Projects/RTDCONN/partial.pcap", true, true);
         p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
                 new ArrayList<boolean[]>(), 2);
         for (int i=0; i<400; i++){

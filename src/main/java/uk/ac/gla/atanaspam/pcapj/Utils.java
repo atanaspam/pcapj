@@ -21,6 +21,7 @@ public class Utils {
     public static int etherTypeOffset = 12;
     public static final int ipProtoOffset = 9; //Offset from etherHeader end
 
+    public static boolean vlanEnabled = false;
     public static final int ipProtoTCP = 6;
     public static final int ipProtoUDP = 17;
     public static final int etherTypeIPv4 = 0x800;
@@ -142,6 +143,7 @@ public class Utils {
      */
     public static boolean isIPPacket(byte[] packet){
         int etherType = convertShort(packet, etherTypeOffset);
+        //LOG.error(etherType+" offset: "+etherTypeOffset);
         return etherType == etherTypeIPv4;
     }
 

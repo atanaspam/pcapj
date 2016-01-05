@@ -17,7 +17,6 @@ public class PcapParser{
 
     private RandomAccessFile raf;
     private boolean verbose = false;
-	private boolean vlanEnabled = false;
     private long fileOffset;
 
     public PcapParser(){
@@ -30,16 +29,20 @@ public class PcapParser{
      * @param value the new setting
      */
 	public void setVlanEnabled(boolean value) {
-		if (value){
-            Utils.etherHeaderLength = Utils.etherHeaderLength + Utils.vlanHeaderLength;
-            Utils.etherTypeOffset = Utils.etherTypeOffset + Utils.vlanHeaderLength;
-            Utils.verIHLOffset = Utils.verIHLOffset + Utils.vlanHeaderLength;
-		} else if (this.vlanEnabled && !value){
-            Utils.etherHeaderLength = Utils.etherHeaderLength - Utils.vlanHeaderLength;
-            Utils.etherTypeOffset = Utils.etherTypeOffset - Utils.vlanHeaderLength;
-            Utils.verIHLOffset = Utils.verIHLOffset - Utils.vlanHeaderLength;
+		if (!Utils.vlanEnabled){
+            if (value) {
+                Utils.etherHeaderLength = Utils.etherHeaderLength + Utils.vlanHeaderLength;
+                Utils.etherTypeOffset = Utils.etherTypeOffset + Utils.vlanHeaderLength;
+                Utils.verIHLOffset = Utils.verIHLOffset + Utils.vlanHeaderLength;
+            }
+		} else{
+            if (!value){
+                Utils.etherHeaderLength = Utils.etherHeaderLength - Utils.vlanHeaderLength;
+                Utils.etherTypeOffset = Utils.etherTypeOffset - Utils.vlanHeaderLength;
+                Utils.verIHLOffset = Utils.verIHLOffset - Utils.vlanHeaderLength;
+            }
 		}
-		this.vlanEnabled = value;
+        Utils.vlanEnabled = value;
 	}
 
 	/**
@@ -82,15 +85,16 @@ public class PcapParser{
 				break;
 
 			offset = offset + read;
-            fileOffset = fileOffset + read;
         }
-        //LOG.info(fileOffset+"");
 		if(read != data.length) {
-            LOG.error("Could not read from file. File may be corrupted.");
+            fileOffset = fileOffset + data.length; // if we failed we just skip this and try to recover
+            //LOG.error("Could not read from file. File may be corrupted.");
             return -1;
         }
-		else
-			return 0;
+		else {
+            fileOffset = fileOffset + read;
+            return 0;
+        }
 	}
 
     /**
@@ -227,11 +231,14 @@ public class PcapParser{
     private synchronized RawPacket readPacket(){
 
         PcapPacketHeader pcapPacketHeader = buildPcapPacketHeader();
-        if(pcapPacketHeader == null)
+        if(pcapPacketHeader == null) {
             return null;
+        }
         byte[] packet = new byte[(int)pcapPacketHeader.packetSize];
-        if(this.readBytes(packet) < 0)
+        if(this.readBytes(packet) < 0) {
+            LOG.error("Could not read packet contents");
             return null;
+        }
         if (verbose) {
             String packetStr = String.format("Packet : %s",
                     javax.xml.bind.DatatypeConverter.printHexBinary(packet));
