@@ -14,7 +14,7 @@ public class TCPPacket extends IPPacket{
     protected int dst_port;
     protected long seqNum;
     protected long ackNum;
-    protected boolean[] flags;
+    protected TCPFlags flags;
 
     protected byte[] data;
 
@@ -34,7 +34,7 @@ public class TCPPacket extends IPPacket{
         return ackNum;
     }
 
-    public boolean[] getFlags() {
+    public TCPFlags getFlags() {
         return flags;
     }
 
@@ -88,10 +88,11 @@ public class TCPPacket extends IPPacket{
 
         byte rawFlags = packet[Utils.calculateTCPoffset(ipHeaderLenght, flagsOffset)];
 
-        this.flags = new boolean[8];
-        for (int i=0;i<flags.length; i++){
-            flags[i] = Utils.isSet(rawFlags, i);
-        }
+        this.flags = new TCPFlags(Utils.isSet(rawFlags, 0), Utils.isSet(rawFlags, 1), Utils.isSet(rawFlags, 2),
+                Utils.isSet(rawFlags, 3), Utils.isSet(rawFlags, 4), Utils.isSet(rawFlags, 5), Utils.isSet(rawFlags, 6),
+                Utils.isSet(rawFlags, 7));
+
+
 
         int payloadDataStart =  Utils.etherHeaderLength +
                 Utils.getIPHeaderLength(packet) + Utils.getTCPHeaderLength(packet);
@@ -108,7 +109,7 @@ public class TCPPacket extends IPPacket{
      * This constructor is only used by an external program using my library and can be safely removed.
      */
     public TCPPacket(long timestamp, String srcMAC, String destMAC, InetAddress srcIP, InetAddress dstIP, int srcPort,
-                    int destPort, boolean[] flags, byte[] data){
+                    int destPort, TCPFlags flags, byte[] data){
 
         super(timestamp,srcMAC, destMAC,srcIP, dstIP);
         this.src_port = srcPort;
@@ -130,7 +131,7 @@ public class TCPPacket extends IPPacket{
 
                 this.timestamp/1000, this.sourceMacAddress, this.destMacAddress, this.src_ip.getHostAddress(),
                this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.seqNum, this.ackNum, this.data.length*/,
-               Arrays.toString(this.flags));
+               flags);
     }
 
 

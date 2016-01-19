@@ -1,5 +1,7 @@
 package uk.ac.gla.atanaspam.pcapj;
 
+import java.io.File;
+
 /**
  * @author atanaspam
  * @version 0.1
@@ -8,10 +10,14 @@ package uk.ac.gla.atanaspam.pcapj;
 public class Main {
     public static void main(String[] args) {
         PcapParser pcapParser = new PcapParser();
-        String path = "YOUR PATH HERE";             //CHANGEME
-        if (pcapParser.openFile(path) < 0) {
-            System.err.println("Failed to open " + path + ", exiting.");
-            return;
+        String path = args[0];             //Your path can go here
+        File f = new File(path);
+        System.out.println(f.getAbsoluteFile());
+        pcapParser.setVlanEnabled(true);
+        pcapParser.setVerbose(false);
+        if(pcapParser.openFile(path) < 0) {
+            System.out.println("Failed to open  file" + ", exiting.");
+            System.exit(-1);
         }
         BasicPacket packet = pcapParser.getPacket();
         while (packet != BasicPacket.EOF) {

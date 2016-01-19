@@ -22,7 +22,7 @@ public class PacketGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(PacketGenerator.class);
     int signature;
     int anomalousTrafficPercentage;
-    ArrayList<boolean[]> flags;
+    ArrayList<TCPFlags> flags;
     ArrayList<InetAddress> srcAddresses;
     ArrayList<InetAddress> dstAddresses;
     ArrayList<Integer> srcPorts;
@@ -44,8 +44,8 @@ public class PacketGenerator {
         this.signature = 0;
         this.anomalousTrafficPercentage = 10;
         packetsTillAnomaly = 100 / anomalousTrafficPercentage;
-        this.flags = new ArrayList<boolean[]>();
-        boolean[] flag ={false,false,false,true,false,false,true,false};
+        this.flags = new ArrayList<TCPFlags>();
+        TCPFlags flag = new TCPFlags(false,false,false,true,false,false,true,false);
         flags.add(flag);
         this.srcAddresses = new ArrayList<InetAddress>();
         this.dstAddresses = new ArrayList<InetAddress>();
@@ -166,7 +166,7 @@ public class PacketGenerator {
      * @param anomalyPercent the percentage of anomalous data in the data generated
      */
     public void set(ArrayList<InetAddress> srcIP, ArrayList<InetAddress> dstIP, ArrayList<Integer> srcPort,
-                          ArrayList<Integer> dstPort, ArrayList<boolean[]> flags, int sig, int anomalyPercent) {
+                          ArrayList<Integer> dstPort, ArrayList<TCPFlags> flags, int sig, int anomalyPercent) {
 
         this.anomalousTrafficPercentage = anomalyPercent;
         packetsTillAnomaly = 100 / anomalousTrafficPercentage;
