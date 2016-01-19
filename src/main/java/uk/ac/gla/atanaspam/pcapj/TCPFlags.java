@@ -53,6 +53,10 @@ public class TCPFlags implements Serializable{
                 cwr, ece,urg, ack, psh, rst, syn, fyn);
     }
 
+    public boolean[] toArray(){
+        return new boolean[]{cwr, ece, urg, ack, psh, rst, syn, fyn};
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
