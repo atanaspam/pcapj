@@ -16,7 +16,7 @@ public class TCPPacket extends IPPacket{
     protected long ackNum;
     protected TCPFlags flags;
 
-    protected byte[] data;
+    protected PacketContents data;
 
     public int getSrc_port() {
         return src_port;
@@ -38,7 +38,7 @@ public class TCPPacket extends IPPacket{
         return flags;
     }
 
-    public byte[] getData() {
+    public PacketContents getData() {
         return data;
     }
 
@@ -101,22 +101,24 @@ public class TCPPacket extends IPPacket{
             data = new byte[packet.length - payloadDataStart];
             System.arraycopy(packet, payloadDataStart, data, 0, data.length);
         }
-        this.data = data;
-
+        try {
+            this.data = new PacketContents(data);
+        }catch (NullPointerException e){
+            this.data = null;
+        }
     }
 
     /**
      * This constructor is only used by an external program using my library and can be safely removed.
      */
     public TCPPacket(long timestamp, String srcMAC, String destMAC, InetAddress srcIP, InetAddress dstIP, int srcPort,
-                    int destPort, TCPFlags flags, byte[] data){
+                    int destPort, TCPFlags flags, PacketContents data){
 
         super(timestamp,srcMAC, destMAC,srcIP, dstIP);
         this.src_port = srcPort;
         this.dst_port = destPort;
         this.flags = flags;
         this.data = data;
-
     }
 
     @Override
@@ -130,8 +132,8 @@ public class TCPPacket extends IPPacket{
                        "DEST PORT: %d%nFLAGS: %s%n",
 
                 this.timestamp/1000, this.sourceMacAddress, this.destMacAddress, this.src_ip.getHostAddress(),
-               this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.seqNum, this.ackNum, this.data.length*/,
-               flags);
+               this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.seqNum, this.ackNum,
+               this.data.getData().length*/, flags);
     }
 
 

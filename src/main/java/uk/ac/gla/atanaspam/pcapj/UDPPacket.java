@@ -14,7 +14,7 @@ public class UDPPacket extends IPPacket{
 
     protected int src_port;
     protected int dst_port;
-    protected byte[] data;
+    protected PacketContents data;
 
     public int getSrc_port() {
         return src_port;
@@ -24,7 +24,7 @@ public class UDPPacket extends IPPacket{
         return dst_port;
     }
 
-    public byte[] getData() {
+    public PacketContents getData() {
         return data;
     }
 
@@ -66,14 +66,18 @@ public class UDPPacket extends IPPacket{
             data = new byte[packet.length - payloadDataStart];
             System.arraycopy(packet, payloadDataStart, data, 0, data.length);
         }
-        this.data = data;
+        try {
+            this.data = new PacketContents(data);
+        }catch (NullPointerException e){
+            this.data = null;
+        }
     }
 
     /**
      * This constructor is only used by an external program using my library and can be safely removed.
      */
     public UDPPacket(long timestamp, String srcMAC, String destMAC, InetAddress srcIP, InetAddress dstIP, int srcPort,
-                     int destPort, byte[] data){
+                     int destPort, PacketContents data){
 
         super(timestamp, srcMAC, destMAC, srcIP, dstIP);
         this.src_port = srcPort;
@@ -89,6 +93,6 @@ public class UDPPacket extends IPPacket{
                 "-----UDP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +
                         "DEST PORT: %d%n",
                 this.timestamp/1000, this.sourceMacAddress, this.destMacAddress, this.src_ip.getHostAddress(),
-                this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.data.length*/);
+                this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.data.getData().length*/);
     }
 }
