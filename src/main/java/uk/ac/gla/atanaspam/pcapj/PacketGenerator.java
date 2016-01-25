@@ -201,7 +201,7 @@ public class PacketGenerator {
         //IPPacket sample = (IPPacket) packets.get(nextPacket);
         TCPPacket p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF",
                 srcAddresses.get(nextSrcAddress), dstAddresses.get(nextDstAddress), srcPorts.get(nextSrcPort),
-                dstPorts.get(nextDstPort), flags.get(nextFlag), null);
+                dstPorts.get(nextDstPort), flags.get(nextFlag), new PacketContents(new byte[1]));
         nextSrcAddress = ++nextSrcAddress % srcAddresses.size();
         nextDstAddress = ++nextDstAddress % dstAddresses.size();
         nextSrcPort = ++nextSrcPort % srcPorts.size();
