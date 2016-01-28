@@ -42,6 +42,22 @@ public class TCPPacket extends IPPacket{
         return data;
     }
 
+    public void setSrc_port(int src_port) {
+        this.src_port = src_port;
+    }
+
+    public void setDst_port(int dst_port) {
+        this.dst_port = dst_port;
+    }
+
+    public void setFlags(TCPFlags flags) {
+        this.flags = flags;
+    }
+
+    public void setData(PacketContents data) {
+        this.data = data;
+    }
+
     /**
      * @deprecated
      * This constructor takes an IPPacket object(superclass) and constructs a TCP

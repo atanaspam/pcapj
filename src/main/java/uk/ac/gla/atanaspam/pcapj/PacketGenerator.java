@@ -35,6 +35,8 @@ public class PacketGenerator {
     int nextSrcPort;
     int nextDstPort;
     int nextPacket;
+    TCPPacket p ;
+           // =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF", null, null, 0, 0, null, null);
 
     /**
      * A constructor that sets default values for all settings.
@@ -65,6 +67,8 @@ public class PacketGenerator {
         nextDstPort = 0;
         nextSrcPort = 0;
         nextPacket = 0;
+        p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF", null, null,
+                0, 0, null, new PacketContents(new byte[1]));
         PcapParser pcapParser = new PcapParser();
         pcapParser.setVlanEnabled(vlanEnabled);
         pcapParser.setVerbose(verbose);
@@ -199,9 +203,14 @@ public class PacketGenerator {
 
     private BasicPacket getAnomalousPacket(){
         //IPPacket sample = (IPPacket) packets.get(nextPacket);
-        TCPPacket p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF",
-                srcAddresses.get(nextSrcAddress), dstAddresses.get(nextDstAddress), srcPorts.get(nextSrcPort),
-                dstPorts.get(nextDstPort), flags.get(nextFlag), new PacketContents(new byte[1]));
+        p.setSrc_ip(srcAddresses.get(nextSrcAddress));
+        p.setDst_ip(dstAddresses.get(nextDstAddress));
+        p.setSrc_port(srcPorts.get(nextSrcPort));
+        p.setDst_port(dstPorts.get(nextDstPort));
+        p.setFlags(flags.get(nextFlag));
+//        p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF",
+//                srcAddresses.get(nextSrcAddress), dstAddresses.get(nextDstAddress), srcPorts.get(nextSrcPort),
+//                dstPorts.get(nextDstPort), flags.get(nextFlag), new PacketContents(new byte[1]));
         nextSrcAddress = ++nextSrcAddress % srcAddresses.size();
         nextDstAddress = ++nextDstAddress % dstAddresses.size();
         nextSrcPort = ++nextSrcPort % srcPorts.size();

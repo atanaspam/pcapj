@@ -43,6 +43,22 @@ public class IPPacket extends BasicPacket{
         return destMacAddress;
     }
 
+    public void setSrc_ip(InetAddress src_ip) {
+        this.src_ip = src_ip;
+    }
+
+    public void setDst_ip(InetAddress dst_ip) {
+        this.dst_ip = dst_ip;
+    }
+
+    public void setSourceMacAddress(String sourceMacAddress) {
+        this.sourceMacAddress = sourceMacAddress;
+    }
+
+    public void setDestMacAddress(String destMacAddress) {
+        this.destMacAddress = destMacAddress;
+    }
+
     /**
      * Basic constructor used to create initial object.
      * Used when nothing else is known for that packet.
