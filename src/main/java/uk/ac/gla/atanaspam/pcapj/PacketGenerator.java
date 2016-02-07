@@ -156,7 +156,33 @@ public class PacketGenerator {
                 return;
             }
         }
+    }
 
+    /**
+     * Resets the settings to the default state.
+     */
+    public void clear() {packetsTillAnomaly = 100 / anomalousTrafficPercentage;
+        this.flags = new ArrayList<TCPFlags>();
+        TCPFlags flag = new TCPFlags(false,false,false,true,false,false,true,false);
+        flags.add(flag);
+        this.srcAddresses = new ArrayList<InetAddress>();
+        this.dstAddresses = new ArrayList<InetAddress>();
+        try {
+            srcAddresses.add(InetAddress.getByName("192.168.1.1"));
+            dstAddresses.add(InetAddress.getByName("192.168.0.1"));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        this.srcPorts = new ArrayList<Integer>();
+        this.dstPorts = new ArrayList<Integer>();
+        srcPorts.add(80);
+        dstPorts.add(80);
+        nextDstAddress = 0;
+        nextSrcAddress = 0;
+        nextFlag = 0;
+        nextDstPort = 0;
+        nextSrcPort = 0;
+        nextPacket = 0;
     }
 
     /**
@@ -197,10 +223,23 @@ public class PacketGenerator {
         }
     }
 
+    /**
+     * Setter method that changes the anomalous traffic percentage and adjusts the
+     * packetsTillAnomaly accordingly.
+     * @param anomalousTrafficPercentage
+     */
     public void setAnomalousTrafficPercentage(int anomalousTrafficPercentage) {
         this.anomalousTrafficPercentage = anomalousTrafficPercentage;
+        if(anomalousTrafficPercentage != 1){
+            packetsTillAnomaly = 100 / anomalousTrafficPercentage;
+        }
+
     }
 
+    /**
+     * Obtain a packet with fields set to anomalous values (Anomalous packet)
+     * @return the anomalous packet
+     */
     private BasicPacket getAnomalousPacket(){
         //IPPacket sample = (IPPacket) packets.get(nextPacket);
         p.setSrc_ip(srcAddresses.get(nextSrcAddress));
@@ -220,6 +259,10 @@ public class PacketGenerator {
         return p;
     }
 
+    /**
+     * Obtain a packet from the static export
+     * @return the ordinary packet
+     */
     private BasicPacket getOrdinaryPacket(){
         packetsTillAnomaly--;
         nextPacket = ++nextPacket % packets.size();
@@ -231,9 +274,16 @@ public class PacketGenerator {
      * @param args
      */
     public static void main (String[] args){
-        PacketGenerator p = new PacketGenerator("/Users/atanaspam/Documents/Versoned Projects/RTDCONN/partial.pcap", true, true);
+        PacketGenerator p = new PacketGenerator("/Users/atanaspam/Documents/Versoned_Projects/RTDCONN/partial.pcap", true, false);
         p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
-                new ArrayList<boolean[]>(), 2);
+                new ArrayList<boolean[]>(), 0);
+        for (int i=0; i<400; i++){
+            System.out.println(p.getPacket());
+        }
+        System.out.println("-----------------------------------------------------------------------------------");
+        p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
+                new ArrayList<boolean[]>(), 1);
+        p.setAnomalousTrafficPercentage(10);
         for (int i=0; i<400; i++){
             System.out.println(p.getPacket());
         }
