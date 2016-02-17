@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class PacketGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PacketGenerator.class);
-    long anomalousPacketsEmitted;
+    double anomalousPacketsEmitted;
     int signature;
     int anomalousTrafficPercentage;
     ArrayList<TCPFlags> flags;
@@ -227,7 +227,7 @@ public class PacketGenerator {
      * Get the number of anomalous packets emitted until now
      * @return the number of packets
      */
-    public long getAnomalousPacketsEmitted() {
+    public double getAnomalousPacketsEmitted() {
         return anomalousPacketsEmitted;
     }
 
@@ -280,16 +280,24 @@ public class PacketGenerator {
      * @param args
      */
     public static void main (String[] args){
-        PacketGenerator p = new PacketGenerator("test.pcap", true, false);
-        p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
-                new ArrayList<boolean[]>(), 0);
-        for (int i=0; i<400; i++){
-            System.out.println(p.getPacket());
-        }
-        System.out.println("-----------------------------------------------------------------------------------");
-        p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
-                new ArrayList<boolean[]>(), 1);
-        p.setAnomalousTrafficPercentage(10);
+//        PacketGenerator p = new PacketGenerator("test.pcap", true, false);
+//        p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
+//                new ArrayList<boolean[]>(), 0);
+//        for (int i=0; i<400; i++){
+//            System.out.println(p.getPacket());
+//        }
+//        System.out.println("-----------------------------------------------------------------------------------");
+//        p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
+//                new ArrayList<boolean[]>(), 1);
+//        p.setAnomalousTrafficPercentage(10);
+//        for (int i=0; i<400; i++){
+//            System.out.println(p.getPacket());
+//        }
+        PacketGenerator p;
+        p = new PacketGenerator("/Users/atanaspam/Documents/Versoned_Projects/RTDCONN/univ1_pt1.pcap", true, false);
+        p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(),
+                new ArrayList<Integer>(), new ArrayList<boolean[]>(),1);
+        p.setAnomalousTrafficPercentage(1);
         for (int i=0; i<400; i++){
             System.out.println(p.getPacket());
         }
