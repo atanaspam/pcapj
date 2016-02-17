@@ -31,7 +31,7 @@ public class Utils {
 
 
     /**
-     * This method retries the Ethertype of a packet that is not supported.
+     * Retrieves the EtherType of a packet that is not supported.
      * @param packet a byte[] storing raw packet information.
      * @return a String representing the hex Ethertype code.
      */
@@ -41,16 +41,16 @@ public class Utils {
 
 
     /**
-     * This method obtains the length of the IP header
+     * Obtains the length of the IP header.
      * @param packet a byte[] storing raw packet information.
-     * @return the length
+     * @return the length.
      */
     public static int getIPHeaderLength(byte[] packet){
         return (packet[verIHLOffset] & 0xF) * 4;
     }
 
     /**
-     * This method obtains the end of the TCP header index in the packet param
+     * Obtains the end of the TCP header index in the packet param
      * @param packet a byte[] storing raw packet information.
      * @return the index where the header ends and the payload starts
      */
@@ -63,9 +63,9 @@ public class Utils {
     }
 
     /**
-     * This method converts a 4 byte int to a decimal int
-     * @param data a byte[] storing a 4 byte int
-     * @return a decimal Integer that is equal to the byte[] integer
+     * Converts a 4 byte int to a decimal int.
+     * @param data a byte[] storing a 4 byte int.
+     * @return a decimal Integer that is equal to the byte[] integer.
      */
     public static long convertInt(byte[] data){
 
@@ -74,7 +74,7 @@ public class Utils {
     }
 
     /**
-     * This method converts a 4 byte integer that is stored in a byte[] and converts it to a decimal int
+     * Converts a 4 byte integer that is stored in a byte[] and converts it to a decimal int
      * @param data the byte[] that stores the Integer of interest
      * @param offset the offset into the data[]
      * @return a decimal Integer that is equal to the byte[] integer
@@ -95,10 +95,10 @@ public class Utils {
     }
 
     /**
-     * This method converts a 2 byte integer that is stored in a byte[] and converts it to a decimal int
-     * @param data the byte[] that stores the Integer of interest
-     * @param offset the offset into the data[]
-     * @return a decimal Integer that is equal to the byte[] integer
+     * Converts a 2 byte integer that is stored in a byte[] to a decimal int.
+     * @param data the byte[] that stores the Integer that needs to be extracted.
+     * @param offset the offset into the data[].
+     * @return a decimal Integer that is equal to the byte[] integer.
      */
     public static int convertShort(byte[] data, int offset){
         byte[] target = new byte[2];
@@ -107,13 +107,11 @@ public class Utils {
     }
 
     /**
-     * This method converts a byte[6] that stores a mac address to a
-     * easily readable ':' separated mac address String.
-     * @param source a byte[] that stores a hexadecimal mac address
-     * @return a String
+     * Converts a byte[6] that stores a mac address to an easily readable ':' separated mac address String.
+     * @param source a byte[] that stores a hexadecimal mac address.
+     * @return a String representation of the Hex MAC address.
      */
     public static String getMacAddress(byte[] source){
-        //System.arraycopy(packet, 0, mac1, 0, mac1.length);
         StringBuilder str = null;
         try {
             String rawString = javax.xml.bind.DatatypeConverter.printHexBinary(source);
@@ -128,18 +126,17 @@ public class Utils {
                     n++;
                 }
             }
-
+            return str.toString();
         }catch (Exception e){
-            LOG.error("An error has occured while parsing a MAC address");
+            LOG.error("An error has occurred while parsing a MAC address");
         }
-
-        return str.toString();
+        return null;
     }
 
     /**
-     * Check if the packet supplied is a known IP packet (IPv4)
-     * @param packet a byte[] storing a raw packet
-     * @return whether the packet is known or not
+     * Checks if the packet supplied is a known IP packet (IPv4).
+     * @param packet a byte[] storing a raw packet.
+     * @return true if the packet is IPv4, false otherwise.
      */
     public static boolean isIPPacket(byte[] packet){
         int etherType = convertShort(packet, etherTypeOffset);
@@ -148,9 +145,9 @@ public class Utils {
     }
 
     /**
-     * Check if the packet supplied is a UDP packet
-     * @param packet a byte[] storing a raw packet
-     * @return whether the packet is UDP
+     * Checks if the packet supplied is a UDP packet.
+     * @param packet a byte[] storing a raw packet.
+     * @return true if the packet is UDP, false otherwise.
      */
     public static boolean isUDPPacket(byte[] packet){
         if(!isIPPacket(packet))
@@ -159,9 +156,9 @@ public class Utils {
     }
 
     /**
-     * Check if the packet supplied is a TCP packet
-     * @param packet a byte[] storing a raw packet
-     * @return whether the packet is TCP
+     * Checks if the packet supplied is a TCP packet.
+     * @param packet a byte[] storing a raw packet.
+     * @return true if the packet is TCP, false otherwise.
      */
     public static boolean isTCPPacket(byte[] packet){
         if(!isIPPacket(packet))
@@ -170,11 +167,11 @@ public class Utils {
     }
 
     /**
-     * This method calculates a custom offset within the TCP segment of a packet
+     * Calculates a custom offset within the TCP segment of a packet.
      * Used with byte[] raw packet representation
-     * @param IPHeaderLength the Lenght of the IP part of the header
-     * @param customOffset The custom offset that needs to be added
-     * @return the custom offset
+     * @param IPHeaderLength the Length of the IP part of the header.
+     * @param customOffset the custom offset that needs to be added.
+     * @return the custom offset.
      */
     public static int calculateTCPoffset(int IPHeaderLength, int customOffset){
         return etherHeaderLength +
@@ -211,10 +208,10 @@ public class Utils {
 
     /**
      * AN Aux function to obtain the value of a flag.
-     * Used when getting the TCP flag values in TCPPacket
-     * @param value a byte containing the required bits
-     * @param bit the index of the bit of interest
-     * @return true if bit is 1 false if not
+     * Used when getting the TCP flag values in TCPPacket.
+     * @param value a byte containing the required bits.
+     * @param bit the index of the bit of interest.
+     * @return true if bit is 1 false if not.
      */
     public static boolean isSet(byte value, int bit){
         return (value&(1<<bit))!=0;

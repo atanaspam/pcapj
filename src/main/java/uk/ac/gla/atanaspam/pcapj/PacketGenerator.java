@@ -3,7 +3,6 @@ package uk.ac.gla.atanaspam.pcapj;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import java.util.ArrayList;
 public class PacketGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PacketGenerator.class);
+    long anomalousPacketsEmitted;
     int signature;
     int anomalousTrafficPercentage;
     ArrayList<TCPFlags> flags;
@@ -36,12 +36,12 @@ public class PacketGenerator {
     int nextDstPort;
     int nextPacket;
     TCPPacket p ;
-           // =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF", null, null, 0, 0, null, null);
 
     /**
      * A constructor that sets default values for all settings.
      */
     public PacketGenerator(String path, boolean vlanEnabled, boolean verbose){
+        anomalousPacketsEmitted = 0;
         packets = new ArrayList<BasicPacket>();
         this.signature = 0;
         this.anomalousTrafficPercentage = 10;
@@ -224,6 +224,14 @@ public class PacketGenerator {
     }
 
     /**
+     * Get the number of anomalous packets emitted until now
+     * @return the number of packets
+     */
+    public long getAnomalousPacketsEmitted() {
+        return anomalousPacketsEmitted;
+    }
+
+    /**
      * Setter method that changes the anomalous traffic percentage and adjusts the
      * packetsTillAnomaly accordingly.
      * @param anomalousTrafficPercentage
@@ -247,15 +255,13 @@ public class PacketGenerator {
         p.setSrc_port(srcPorts.get(nextSrcPort));
         p.setDst_port(dstPorts.get(nextDstPort));
         p.setFlags(flags.get(nextFlag));
-//        p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF",
-//                srcAddresses.get(nextSrcAddress), dstAddresses.get(nextDstAddress), srcPorts.get(nextSrcPort),
-//                dstPorts.get(nextDstPort), flags.get(nextFlag), new PacketContents(new byte[1]));
         nextSrcAddress = ++nextSrcAddress % srcAddresses.size();
         nextDstAddress = ++nextDstAddress % dstAddresses.size();
         nextSrcPort = ++nextSrcPort % srcPorts.size();
         nextDstPort = ++nextDstPort % dstPorts.size();
         nextFlag = ++nextFlag % flags.size();
         packetsTillAnomaly = 100 /anomalousTrafficPercentage;
+        anomalousPacketsEmitted++;
         return p;
     }
 
@@ -274,7 +280,7 @@ public class PacketGenerator {
      * @param args
      */
     public static void main (String[] args){
-        PacketGenerator p = new PacketGenerator("/Users/atanaspam/Documents/Versoned_Projects/RTDCONN/partial.pcap", true, false);
+        PacketGenerator p = new PacketGenerator("test.pcap", true, false);
         p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(), new ArrayList<Integer>(),
                 new ArrayList<boolean[]>(), 0);
         for (int i=0; i<400; i++){

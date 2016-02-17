@@ -26,6 +26,11 @@ R 0.3 - MAC address capture, SEQ and ACK nums for TCP, overall layout improved.
 R 0.2 - Parsing robustness enhancements, packet timestamps.
 R 0.1 - Initial release.
 
+FUTURE WORK
+
+Add flexible VLAN support and possibly a field in "IPPacket" that can store the captured VLAN information.
+Add IPv6 support.
+
 How to use
 
 You can run the program from the Main class which prints the contents of each packet read.
