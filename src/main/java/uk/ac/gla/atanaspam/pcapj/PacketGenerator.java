@@ -162,13 +162,11 @@ public class PacketGenerator {
             case 5: {
                 // Simulate an Application layer attack ()
                 signature = 5;
-                System.out.println(this.packetContents);
                 try {
                     //this.packetContents.add(new PacketContents("".getBytes("UTF-8")));
                     this.packetContents.add(new PacketContents("aaa".getBytes("UTF-8")));
                 } catch (UnsupportedEncodingException e) {
                 }
-                System.out.println(this.packetContents);
                 return;
             }
             default: {
