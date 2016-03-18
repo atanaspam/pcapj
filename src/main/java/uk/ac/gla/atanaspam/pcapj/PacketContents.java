@@ -1,6 +1,7 @@
 package uk.ac.gla.atanaspam.pcapj;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 /**
@@ -37,5 +38,15 @@ public class PacketContents implements Serializable{
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return new String(data, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }

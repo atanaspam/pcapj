@@ -145,11 +145,11 @@ public class TCPPacket extends IPPacket{
                         "DEST PORT: %d%nSEQ NUM: %d%nACK NUM: %d%nPAYLOAD LEN: %d%nFLAGS: %s%n",
                */
                "-----TCP PACKET-----%nTimeStamp: %d%nSRC MAC: %s%nDST MAC: %s%nSRC IP: %s%nDEST IP: %s%nSRC PORT: %d%n" +
-                       "DEST PORT: %d%nFLAGS: %s%n",
+                       "DEST PORT: %d%nFLAGS: %s%nCONTENTS: %s%n",
 
                 this.timestamp/1000, this.sourceMacAddress, this.destMacAddress, this.src_ip.getHostAddress(),
                this.dst_ip.getHostAddress(), this.src_port, this.dst_port/*, this.seqNum, this.ackNum,
-               this.data.getData().length*/, flags);
+               this.data.getData().length*/, flags, data.toString());
     }
 
 

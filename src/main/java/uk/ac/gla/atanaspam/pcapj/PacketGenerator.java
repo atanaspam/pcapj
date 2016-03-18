@@ -3,6 +3,8 @@ package uk.ac.gla.atanaspam.pcapj;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class PacketGenerator {
     ArrayList<Integer> srcPorts;
     ArrayList<Integer> dstPorts;
     ArrayList<BasicPacket> packets;
+    ArrayList<PacketContents> packetContents;
     int packetsTillAnomaly;
     int nextFlag;
     int nextSrcAddress;
@@ -35,6 +38,7 @@ public class PacketGenerator {
     int nextSrcPort;
     int nextDstPort;
     int nextPacket;
+    int nextPacketContents;
     TCPPacket p ;
 
     /**
@@ -51,6 +55,7 @@ public class PacketGenerator {
         flags.add(flag);
         this.srcAddresses = new ArrayList<InetAddress>();
         this.dstAddresses = new ArrayList<InetAddress>();
+        this.packetContents = new ArrayList<PacketContents>();
         try {
             srcAddresses.add(InetAddress.getByName("192.168.1.1"));
             dstAddresses.add(InetAddress.getByName("192.168.0.1"));
@@ -61,12 +66,18 @@ public class PacketGenerator {
         this.dstPorts = new ArrayList<Integer>();
         srcPorts.add(80);
         dstPorts.add(80);
+        try {
+            packetContents.add(new PacketContents("1".getBytes("UTF-8")));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         nextDstAddress = 0;
         nextSrcAddress = 0;
         nextFlag = 0;
         nextDstPort = 0;
         nextSrcPort = 0;
         nextPacket = 0;
+        nextPacketContents = 0;
         p =  new TCPPacket(1445457108, "FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF", null, null,
                 0, 0, null, new PacketContents(new byte[1]));
         PcapParser pcapParser = new PcapParser();
@@ -101,13 +112,13 @@ public class PacketGenerator {
      * @param sig The integer representation of the current attack (pattern) simulated
      */
     public void configure(ArrayList<InetAddress> srcIP, ArrayList<InetAddress> dstIP, ArrayList<Integer> srcPort,
-                          ArrayList<Integer> dstPort, ArrayList<boolean[]> flags, int sig){
-        for (boolean[] a : flags){ flags.add(a);}
+                          ArrayList<Integer> dstPort, ArrayList<boolean[]> flags, int sig, ArrayList<PacketContents> packetContents){
+        for (boolean[] a : flags){ this.flags.add(new TCPFlags(a));}
         for (InetAddress a : srcIP){ srcAddresses.add(a);}
         for (InetAddress a : dstIP){ dstAddresses.add(a);}
         for(Integer n : srcPort){ srcPorts.add(n);}
         for(Integer n : dstPort){ dstPorts.add(n);}
-
+        for(PacketContents p : packetContents){ this.packetContents.add(p);}
         switch (sig) {
             case 0: {
                 // Disable
@@ -137,18 +148,28 @@ public class PacketGenerator {
             case 3: {
                 // Simulate a SYN flood attack
                 signature = 3;
-                flags.clear();
-                flags.add(new boolean[]{false,false,false,false,false,false,true,false});
+                this.flags.clear();
+                this.flags.add(new TCPFlags(new boolean[]{false,false,false,false,false,false,true,false}));
                 return;
             }
             case 4: {
                 // Simulate Invalid flags
-                flags.clear();
+                this.flags.clear();
                 // Since no flag is set, this is an invalid combination.
-                flags.add(new boolean[]{false,false,false,false,false,false,false,false});
+                this.flags.add(new TCPFlags(new boolean[]{false,false,false,false,false,false,false,false}));
+                return;
             }
             case 5: {
                 // Simulate an Application layer attack ()
+                signature = 5;
+                System.out.println(this.packetContents);
+                try {
+                    //this.packetContents.add(new PacketContents("".getBytes("UTF-8")));
+                    this.packetContents.add(new PacketContents("aaa".getBytes("UTF-8")));
+                } catch (UnsupportedEncodingException e) {
+                }
+                System.out.println(this.packetContents);
+                return;
             }
             default: {
                 // Disable
@@ -167,6 +188,7 @@ public class PacketGenerator {
         flags.add(flag);
         this.srcAddresses = new ArrayList<InetAddress>();
         this.dstAddresses = new ArrayList<InetAddress>();
+        this.packetContents = new ArrayList<PacketContents>();
         try {
             srcAddresses.add(InetAddress.getByName("192.168.1.1"));
             dstAddresses.add(InetAddress.getByName("192.168.0.1"));
@@ -183,6 +205,7 @@ public class PacketGenerator {
         nextDstPort = 0;
         nextSrcPort = 0;
         nextPacket = 0;
+        nextPacketContents = 0;
     }
 
     /**
@@ -196,7 +219,8 @@ public class PacketGenerator {
      * @param anomalyPercent the percentage of anomalous data in the data generated
      */
     public void set(ArrayList<InetAddress> srcIP, ArrayList<InetAddress> dstIP, ArrayList<Integer> srcPort,
-                          ArrayList<Integer> dstPort, ArrayList<TCPFlags> flags, int sig, int anomalyPercent) {
+                          ArrayList<Integer> dstPort, ArrayList<TCPFlags> flags, ArrayList<PacketContents> packetContents,
+                            int sig, int anomalyPercent) {
 
         this.anomalousTrafficPercentage = anomalyPercent;
         packetsTillAnomaly = 100 / anomalousTrafficPercentage;
@@ -206,6 +230,7 @@ public class PacketGenerator {
         this.dstPorts = dstPort;
         this.flags = flags;
         this.signature = sig;
+        this.packetContents = packetContents;
     }
 
     /**
@@ -255,11 +280,13 @@ public class PacketGenerator {
         p.setSrc_port(srcPorts.get(nextSrcPort));
         p.setDst_port(dstPorts.get(nextDstPort));
         p.setFlags(flags.get(nextFlag));
+        p.setData(packetContents.get(nextPacketContents));
         nextSrcAddress = ++nextSrcAddress % srcAddresses.size();
         nextDstAddress = ++nextDstAddress % dstAddresses.size();
         nextSrcPort = ++nextSrcPort % srcPorts.size();
         nextDstPort = ++nextDstPort % dstPorts.size();
         nextFlag = ++nextFlag % flags.size();
+        nextPacketContents = ++nextPacketContents % packetContents.size();
         packetsTillAnomaly = 100 /anomalousTrafficPercentage;
         anomalousPacketsEmitted++;
         return p;
@@ -295,9 +322,15 @@ public class PacketGenerator {
 //        }
         PacketGenerator p;
         p = new PacketGenerator("/Users/atanaspam/Documents/Versoned_Projects/RTDCONN/univ1_pt1.pcap", true, false);
-        p.configure(new ArrayList<InetAddress>(), new ArrayList<InetAddress>(), new ArrayList<Integer>(),
-                new ArrayList<Integer>(), new ArrayList<boolean[]>(),1);
-        p.setAnomalousTrafficPercentage(22);
+        ArrayList<InetAddress> a = new ArrayList<InetAddress>();
+        try {
+            a.add(InetAddress.getByName("10.10.1.1"));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        p.configure(a, new ArrayList<InetAddress>(), new ArrayList<Integer>(),
+                new ArrayList<Integer>(), new ArrayList<boolean[]>(),5, new ArrayList<PacketContents>());
+        p.setAnomalousTrafficPercentage(20);
         for (int i=0; i<400; i++){
             System.out.println(p.getPacket());
         }
